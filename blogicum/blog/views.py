@@ -65,12 +65,19 @@ class UserPostsListView(MainPostListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        post = Post.objects.all()
-        paginator = Paginator(post, 10)
-        page_obj = paginator.get_page(post)
+        posts = self.get_queryset()
+        page_obj = self.get_page(posts)
         context['profile'] = self.author
         context['page_obj'] = page_obj
         return context
+
+    def get_page(self, queryset):
+        paginator = Paginator(queryset, 10)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        for post in page_obj:
+            post.comment_count = post.comments.count()
+        return page_obj
 
 
 class PostListView(ListView):
