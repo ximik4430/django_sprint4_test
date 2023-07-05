@@ -65,8 +65,9 @@ class UserPostsListView(MainPostListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        posts = self.get_queryset()
-        page_obj = self.get_page(posts)
+        post = Post.objects.select_related('author')
+        paginator = Paginator(post, 10)
+        page_obj = paginator.get_page(post)
         context['profile'] = self.author
         context['page_obj'] = page_obj
         return context
